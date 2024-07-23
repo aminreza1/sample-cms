@@ -1,4 +1,8 @@
+using AutoMapper;
 using ContentManagementSystem.App;
+using ContentManagementSystem.App.Mappers;
+using ContentManagementSystem.Repositories;
+using ContentManagementSystem.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,10 +17,18 @@ builder.Services.AddDbContext<AppDbContext>
         opt.UseSqlServer(configs.GetConnectionString("CmsConnection"));
     });
 
+builder.Services.AddScoped<IArticleRepo, ArticleRepo>();
+
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new ArticleMappers());
+});
+
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
 
 
 var app = builder.Build();
